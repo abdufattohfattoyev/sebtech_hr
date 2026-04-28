@@ -1,0 +1,43 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sebtech_hr_bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - bot-network
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - bot-network
+
+volumes:
+  data:
+  redis-data:
+
+networks:
+  bot-network:
+    driver: bridge
