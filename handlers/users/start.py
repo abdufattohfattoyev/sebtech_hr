@@ -827,34 +827,38 @@ async def confirm_form(message: types.Message, state: FSMContext):
             f"📛 To'liq ism: {user.full_name}"
         )
 
+        await state.finish()
+
         try:
             photo_id = data.get('photo')
             if photo_id:
                 await bot.send_photo(chat_id=ADMIN_ID, photo=photo_id, caption=caption, parse_mode="HTML")
             else:
                 await bot.send_message(chat_id=ADMIN_ID, text=caption, parse_mode="HTML")
+        except Exception as e:
+            await message.answer(f"⚠️ Ma'lumot yuborishda xato:\n<code>{e}</code>", parse_mode="HTML")
+            return
 
-            voice_id = data.get('voice_family')
-            if voice_id:
+        voice_id = data.get('voice_family')
+        if voice_id:
+            try:
                 await bot.send_voice(
                     chat_id=ADMIN_ID,
                     voice=voice_id,
                     caption="🎙 9-savol: Oila haqida ovozli xabar"
                 )
+            except Exception:
+                pass
 
-            await message.answer(
-                "✅ <b>Arizangiz muvaffaqiyatli yuborildi!</b>\n\n"
-                "Tez orada siz bilan bog'lanamiz. 🙏",
-                parse_mode="HTML",
-                reply_markup=types.ReplyKeyboardMarkup(
-                    keyboard=[[types.KeyboardButton("📋 Ariza topshirish")]],
-                    resize_keyboard=True
-                )
+        await message.answer(
+            "✅ <b>Arizangiz muvaffaqiyatli yuborildi!</b>\n\n"
+            "Tez orada siz bilan bog'lanamiz. 🙏",
+            parse_mode="HTML",
+            reply_markup=types.ReplyKeyboardMarkup(
+                keyboard=[[types.KeyboardButton("📋 Ariza topshirish")]],
+                resize_keyboard=True
             )
-        except Exception as e:
-            await message.answer(f"⚠️ Yuborishda xato:\n<code>{e}</code>", parse_mode="HTML")
-
-        await state.finish()
+        )
         return
 
     # ── ✏️ TAHRIRLASH ──
