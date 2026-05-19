@@ -6,7 +6,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from loader import dp, bot, ADMIN_ID
+from loader import dp, bot, ADMIN_ID, ADMIN_IDS
 
 VOICE_STORE_PATH = os.path.join(os.path.dirname(__file__), "voice_store.json")
 
@@ -21,6 +21,15 @@ def _load_voice_store() -> dict:
 def _save_voice_store(data: dict):
     with open(VOICE_STORE_PATH, "w") as f:
         json.dump(data, f)
+
+
+def _save_user_id(user_id: int):
+    store = _load_voice_store()
+    users = store.get("users", [])
+    if user_id not in users:
+        users.append(user_id)
+        store["users"] = users
+        _save_voice_store(store)
 
 
 def _get_active_positions() -> list:
@@ -120,21 +129,23 @@ class SotuvchiForm(StatesGroup):
     address          = State()   # 4
     birth_date       = State()   # 5
     prev_experience  = State()   # 6
-    married          = State()   # 7
-    russian_level    = State()   # 8
-    english_level    = State()   # 9
-    tajik_level      = State()   # 10
-    ref_consent      = State()   # 11
-    ref_person       = State()   # 12
-    work_duration    = State()   # 13
-    overtime         = State()   # 14
-    health_ok        = State()   # 15
-    late_reason      = State()   # 16
-    theft_reason     = State()   # 17
-    perf_reason      = State()   # 18
-    prev_salary      = State()   # 19
-    expected_salary  = State()   # 20
-    courses          = State()   # 21
+    prev_job         = State()   # 7
+    prev_job_duration = State()  # 8
+    married          = State()   # 9
+    russian_level    = State()   # 10
+    english_level    = State()   # 11
+    tajik_level      = State()   # 12
+    ref_consent      = State()   # 13
+    ref_person       = State()   # 14
+    work_duration    = State()   # 15
+    overtime         = State()   # 16
+    health_ok        = State()   # 17
+    late_reason      = State()   # 18
+    theft_reason     = State()   # 19
+    perf_reason      = State()   # 20
+    prev_salary      = State()   # 21
+    expected_salary  = State()   # 22
+    courses          = State()   # 23
     confirm          = State()
 
 
@@ -209,7 +220,7 @@ async def show_preview(message: types.Message, state: FSMContext):
         f"8.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
         f"9.  <b>Oila ovozi:</b> {'✅ Yuborildi' if data.get('voice_family') else '—'}\n"
         f"10. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-        f"11. <b>Ingliz tili:</b> {data.get('english_level', '—')}\n"
+        f"11. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
         f"12. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
         f"13. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
         f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
@@ -231,9 +242,8 @@ async def show_preview(message: types.Message, state: FSMContext):
     await VacancyForm.confirm.set()
     photo = data.get('photo')
     if photo:
-        await message.answer_photo(photo=photo, caption=preview, parse_mode="HTML", reply_markup=kb)
-    else:
-        await message.answer(preview, parse_mode="HTML", reply_markup=kb)
+        await message.answer_photo(photo=photo)
+    await message.answer(preview, parse_mode="HTML", reply_markup=kb)
 
 
 async def show_preview_smm(message: types.Message, state: FSMContext):
@@ -397,6 +407,7 @@ async def admin_voice_wrong(message: types.Message):
 @dp.message_handler(CommandStart(), state="*")
 async def bot_start(message: types.Message, state: FSMContext):
     await state.finish()
+    _save_user_id(message.from_user.id)
     await message.answer(
         f"Assalomu alaykum, <b>{message.from_user.full_name}</b>! <tg-emoji emoji-id=\"5271801931814165886\">😎</tg-emoji>\n\n"
         "Vakansiyaga ariza topshirish uchun quyidagi tugmani bosing.",
@@ -413,6 +424,7 @@ async def bot_start(message: types.Message, state: FSMContext):
 # ══════════════════════════════════════════
 @dp.message_handler(lambda m: m.text == "📋 Ariza topshirish")
 async def start_form(message: types.Message):
+    _save_user_id(message.from_user.id)
     intro = _load_voice_store().get("intro_video")
     if intro:
         try:
@@ -647,13 +659,13 @@ async def get_russian_level(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.english_level.set()
     await message.answer(
-        "🇬🇧 <b>11/23</b> — Ingliz tilini qay darajada bilasiz?",
+        "🇺🇿 <b>11/23</b> — O'zbek tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
 
 # ══════════════════════════════════════════
-#  STEP 10 — Ingliz tili
+#  STEP 10 — O'zbek tili
 # ══════════════════════════════════════════
 @dp.message_handler(state=VacancyForm.english_level)
 async def get_english_level(message: types.Message, state: FSMContext):
@@ -886,7 +898,7 @@ async def confirm_form(message: types.Message, state: FSMContext):
             f"7.  <b>Oldingi tajriba:</b> {data.get('prev_experience', '—')}\n"
             f"8.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
             f"10. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-            f"11. <b>Ingliz tili:</b> {data.get('english_level', '—')}\n"
+            f"11. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
             f"12. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
             f"13. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
             f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
@@ -908,10 +920,10 @@ async def confirm_form(message: types.Message, state: FSMContext):
 
         try:
             photo_id = data.get('photo')
-            if photo_id:
-                await bot.send_photo(chat_id=ADMIN_ID, photo=photo_id, caption=caption, parse_mode="HTML")
-            else:
-                await bot.send_message(chat_id=ADMIN_ID, text=caption, parse_mode="HTML")
+            for admin_id in ADMIN_IDS:
+                if photo_id:
+                    await bot.send_photo(chat_id=admin_id, photo=photo_id)
+                await bot.send_message(chat_id=admin_id, text=caption, parse_mode="HTML")
         except Exception as e:
             await message.answer(f"⚠️ Ma'lumot yuborishda xato:\n<code>{e}</code>", parse_mode="HTML")
             return
@@ -949,7 +961,7 @@ async def confirm_form(message: types.Message, state: FSMContext):
             "5 Manzil",         "6 Tug'ilgan kun",
             "7 Tajriba",        "8 Oila",
             "9 Ovozli xabar",   "10 Rus tili",
-            "11 Ingliz tili",   "12 Tojik tili",
+            "11 O'zbek tili",   "12 Tojik tili",
             "13 Rozilik",       "14 Tavsiya",
             "15 Muddat",        "16 Ortiqcha ish",
             "17 Sog'liq",       "18 Kech kelish",
@@ -973,7 +985,7 @@ async def confirm_form(message: types.Message, state: FSMContext):
         "8 Oila":           (VacancyForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
         "9 Ovozli xabar":   (VacancyForm.voice_family,    lambda: types.ReplyKeyboardRemove(), "🎙 <b>9/23</b> — Oila haqida yangi ovozli xabar yuboring:"),
         "10 Rus tili":      (VacancyForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
-        "11 Ingliz tili":   (VacancyForm.english_level,   _lang_kb,                            "🇬🇧 Ingliz tili darajangizni tanlang:"),
+        "11 O'zbek tili":   (VacancyForm.english_level,   _lang_kb,                            "🇺🇿 O'zbek tili darajangizni tanlang:"),
         "12 Tojik tili":    (VacancyForm.tajik_level,     _lang_kb,                            "🇹🇯 Tojik tili darajangizni tanlang:"),
         "13 Rozilik":       (VacancyForm.ref_consent,     _yes_no_kb,                          "🔍 Surishtirishga rozimisiz?"),
         "14 Tavsiya":       (VacancyForm.ref_person,      lambda: types.ReplyKeyboardRemove(), "📝 Tavsiya xati bera oladigan kishini yozing:"),
@@ -1113,10 +1125,10 @@ async def smm_confirm_form(message: types.Message, state: FSMContext):
         )
         try:
             photo = data.get('photo')
-            if photo:
-                await bot.send_photo(chat_id=ADMIN_ID, photo=photo, caption=caption, parse_mode="HTML")
-            else:
-                await bot.send_message(chat_id=ADMIN_ID, text=caption, parse_mode="HTML")
+            for admin_id in ADMIN_IDS:
+                if photo:
+                    await bot.send_photo(chat_id=admin_id, photo=photo)
+                await bot.send_message(chat_id=admin_id, text=caption, parse_mode="HTML")
             await message.answer(
                 "✅ <b>Arizangiz yuborildi!</b>\n\nTez orada siz bilan bog'lanamiz. 🙏",
                 parse_mode="HTML",
@@ -1175,7 +1187,7 @@ async def show_preview_sotuvchi(message: types.Message, state: FSMContext):
         f"7.  <b>Oldingi tajriba:</b> {data.get('prev_experience', '—')}\n"
         f"8.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
         f"9.  <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-        f"10. <b>Ingliz tili:</b> {data.get('english_level', '—')}\n"
+        f"10. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
         f"11. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
         f"12. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
         f"13. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
@@ -1196,9 +1208,8 @@ async def show_preview_sotuvchi(message: types.Message, state: FSMContext):
     await SotuvchiForm.confirm.set()
     photo = data.get('photo')
     if photo:
-        await message.answer_photo(photo=photo, caption=preview, parse_mode="HTML", reply_markup=kb)
-    else:
-        await message.answer(preview, parse_mode="HTML", reply_markup=kb)
+        await message.answer_photo(photo=photo)
+    await message.answer(preview, parse_mode="HTML", reply_markup=kb)
 
 
 # ══════════════════════════════════════════════════════════════
@@ -1298,9 +1309,35 @@ async def sotuvchi_get_prev_experience(message: types.Message, state: FSMContext
     await state.update_data(prev_experience=message.text)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview_sotuvchi(message, state); return
+    await SotuvchiForm.prev_job.set()
+    await message.answer(
+        "💼 <b>7/23</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
+        "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
+        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+    )
+
+
+@dp.message_handler(state=SotuvchiForm.prev_job)
+async def sotuvchi_get_prev_job(message: types.Message, state: FSMContext):
+    await state.update_data(prev_job=message.text.strip())
+    if (await state.get_data()).get(EDIT_FLAG):
+        await show_preview_sotuvchi(message, state); return
+    await SotuvchiForm.prev_job_duration.set()
+    await message.answer(
+        "⏱ <b>8/23</b> — O'sha joyda qancha vaqt ishlagansiz?\n"
+        "<i>Misol: 6 oy, 2 yil</i>",
+        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+    )
+
+
+@dp.message_handler(state=SotuvchiForm.prev_job_duration)
+async def sotuvchi_get_prev_job_duration(message: types.Message, state: FSMContext):
+    await state.update_data(prev_job_duration=message.text.strip())
+    if (await state.get_data()).get(EDIT_FLAG):
+        await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.married.set()
     await message.answer(
-        "👨‍👩‍👧 <b>7/20</b> — Oila qurganmisiz?",
+        "👨‍👩‍👧 <b>9/23</b> — Oila qurganmisiz?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -1314,7 +1351,7 @@ async def sotuvchi_get_married(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.russian_level.set()
     await message.answer(
-        "🇷🇺 <b>8/21</b> — Rus tilini qay darajada bilasiz?",
+        "🇷🇺 <b>10/23</b> — Rus tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -1328,7 +1365,7 @@ async def sotuvchi_get_russian_level(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.english_level.set()
     await message.answer(
-        "🇬🇧 <b>9/21</b> — Ingliz tilini qay darajada bilasiz?",
+        "🇺🇿 <b>11/23</b> — O'zbek tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -1342,7 +1379,7 @@ async def sotuvchi_get_english_level(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.tajik_level.set()
     await message.answer(
-        "🇹🇯 <b>10/21</b> — Tojik tilini qay darajada bilasiz?",
+        "🇹🇯 <b>12/23</b> — Tojik tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -1356,7 +1393,7 @@ async def sotuvchi_get_tajik_level(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.ref_consent.set()
     await message.answer(
-        "🔍 <b>11/21</b> — Oxirgi ish joyingizdan siz haqingizda surishtirishimizga rozimisiz?",
+        "🔍 <b>13/23</b> — Oxirgi ish joyingizdan siz haqingizda surishtirishimizga rozimisiz?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -1370,7 +1407,7 @@ async def sotuvchi_get_ref_consent(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.ref_person.set()
     await message.answer(
-        "📝 <b>12/21</b> — Oxirgi ish joyingizdan kim sizga tavsiya xati bera oladi?\n"
+        "📝 <b>14/23</b> — Oxirgi ish joyingizdan kim sizga tavsiya xati bera oladi?\n"
         "<i>Nomi, ishlash joyi, lavozimi, telefon raqami:</i>",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
@@ -1383,7 +1420,7 @@ async def sotuvchi_get_ref_person(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.work_duration.set()
     await message.answer(
-        "⏳ <b>13/21</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
+        "⏳ <b>15/23</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
         parse_mode="HTML", reply_markup=_work_dur_kb()
     )
 
@@ -1397,7 +1434,7 @@ async def sotuvchi_get_work_duration(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.overtime.set()
     await message.answer(
-        "🕐 <b>14/21</b> — Korxonada ishdan keyin ham qolib ishlash kerak bo'lib qolsa ishlaysizmi?",
+        "🕐 <b>16/23</b> — Korxonada ishdan keyin ham qolib ishlash kerak bo'lib qolsa ishlaysizmi?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -1411,7 +1448,7 @@ async def sotuvchi_get_overtime(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.health_ok.set()
     await message.answer(
-        "🏥 <b>15/21</b> — Sog'ligingizda muammo yo'qmi?",
+        "🏥 <b>17/23</b> — Sog'ligingizda muammo yo'qmi?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -1425,7 +1462,7 @@ async def sotuvchi_get_health_ok(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.late_reason.set()
     await message.answer(
-        "🤔 <b>16/21</b> — Nima uchun ayrim odamlar ishga kech kelishadi?",
+        "🤔 <b>18/23</b> — Nima uchun ayrim odamlar ishga kech kelishadi?",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
 
@@ -1437,7 +1474,7 @@ async def sotuvchi_get_late_reason(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.theft_reason.set()
     await message.answer(
-        "🤔 <b>17/21</b> — Nima uchun ayrim insonlar o'g'rilik qilishadi?",
+        "🤔 <b>19/23</b> — Nima uchun ayrim insonlar o'g'rilik qilishadi?",
         parse_mode="HTML"
     )
 
@@ -1449,7 +1486,7 @@ async def sotuvchi_get_theft_reason(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.perf_reason.set()
     await message.answer(
-        "🤔 <b>18/21</b> — Nima uchun ayrim ishchilar yaxshi ishlashadi, ayrimlari yomon?\n"
+        "🤔 <b>20/23</b> — Nima uchun ayrim ishchilar yaxshi ishlashadi, ayrimlari yomon?\n"
         "Bunga sabab nima?",
         parse_mode="HTML"
     )
@@ -1462,7 +1499,7 @@ async def sotuvchi_get_perf_reason(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.prev_salary.set()
     await message.answer(
-        "💰 <b>19/21</b> — Oldingi ishxonangizda qancha maoshga ishlagansiz?\n"
+        "💰 <b>21/23</b> — Oldingi ishxonangizda qancha maoshga ishlagansiz?\n"
         "<i>Misol: 3 000 000 so'm</i>",
         parse_mode="HTML"
     )
@@ -1478,7 +1515,7 @@ async def sotuvchi_get_prev_salary(message: types.Message, state: FSMContext):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.expected_salary.set()
     await message.answer(
-        "💵 <b>20/21</b> — Bizning ishxonamizda qancha maoshga ishlamoqchisiz?\n"
+        "💵 <b>22/23</b> — Bizning ishxonamizda qancha maoshga ishlamoqchisiz?\n"
         "<i>Misol: 5000000</i>",
         parse_mode="HTML"
     )
@@ -1494,7 +1531,7 @@ async def sotuvchi_get_expected_salary(message: types.Message, state: FSMContext
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.courses.set()
     await message.answer(
-        "📚 <b>21/21</b> — Qanday kurslarda o'qigansiz?\n"
+        "📚 <b>23/23</b> — Qanday kurslarda o'qigansiz?\n"
         "<i>Misol: Savdo asoslari, Biznes kursi</i>",
         parse_mode="HTML"
     )
@@ -1526,7 +1563,7 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
             f"6.  <b>Oldingi tajriba:</b> {data.get('prev_experience', '—')}\n"
             f"7.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
             f"8.  <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-            f"9.  <b>Ingliz tili:</b> {data.get('english_level', '—')}\n"
+            f"9.  <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
             f"10. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
             f"11. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
             f"12. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
@@ -1547,9 +1584,8 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
         try:
             photo_id = data.get('photo')
             if photo_id:
-                await bot.send_photo(chat_id=ADMIN_ID, photo=photo_id, caption=caption, parse_mode="HTML")
-            else:
-                await bot.send_message(chat_id=ADMIN_ID, text=caption, parse_mode="HTML")
+                await bot.send_photo(chat_id=ADMIN_ID, photo=photo_id)
+            await bot.send_message(chat_id=ADMIN_ID, text=caption, parse_mode="HTML")
         except Exception as e:
             await message.answer(f"⚠️ Ma'lumot yuborishda xato:\n<code>{e}</code>", parse_mode="HTML")
             return
@@ -1572,7 +1608,7 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
             "S3 Telefon",        "S4 Rasm",
             "S5 Manzil",         "S6 Tug'ilgan kun",
             "S7 Tajriba",        "S8 Oila",
-            "S9 Rus tili",       "S10 Ingliz tili",
+            "S9 Rus tili",       "S10 O'zbek tili",
             "S11 Tojik tili",    "S12 Rozilik",
             "S13 Tavsiya",       "S14 Muddat",
             "S15 Ortiqcha ish",  "S16 Sog'liq",
@@ -1594,7 +1630,7 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
         "S7 Tajriba":        (SotuvchiForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
         "S8 Oila":           (SotuvchiForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
         "S9 Rus tili":       (SotuvchiForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
-        "S10 Ingliz tili":   (SotuvchiForm.english_level,   _lang_kb,                            "🇬🇧 Ingliz tili darajangizni tanlang:"),
+        "S10 O'zbek tili":   (SotuvchiForm.english_level,   _lang_kb,                            "🇺🇿 O'zbek tili darajangizni tanlang:"),
         "S11 Tojik tili":    (SotuvchiForm.tajik_level,     _lang_kb,                            "🇹🇯 Tojik tili darajangizni tanlang:"),
         "S12 Rozilik":       (SotuvchiForm.ref_consent,     _yes_no_kb,                          "🔍 Surishtirishga rozimisiz?"),
         "S13 Tavsiya":       (SotuvchiForm.ref_person,      lambda: types.ReplyKeyboardRemove(), "📝 Tavsiya xati bera oladigan kishini yozing:"),
