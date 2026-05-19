@@ -575,37 +575,37 @@ async def get_birth_date(message: types.Message, state: FSMContext):
     await state.update_data(birth_date=val)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview(message, state); return
-    await VacancyForm.prev_experience.set()
-    await message.answer(
-        "💼 <b>7/24</b> — Oldingi ish tajribangiz qancha?",
-        parse_mode="HTML", reply_markup=_prev_exp_kb()
-    )
-
-
-# ══════════════════════════════════════════
-#  STEP 7 — Oldingi tajriba
-# ══════════════════════════════════════════
-@dp.message_handler(state=VacancyForm.prev_experience)
-async def get_prev_experience(message: types.Message, state: FSMContext):
-    if message.text not in PREV_EXP_OPTIONS:
-        await message.answer("❗ Iltimos, tugmalardan birini tanlang."); return
-    await state.update_data(prev_experience=message.text)
-    if (await state.get_data()).get(EDIT_FLAG):
-        await show_preview(message, state); return
     await VacancyForm.prev_job.set()
     await message.answer(
-        "💼 <b>8/24</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
+        "💼 <b>7/24</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
         "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
 
 
 # ══════════════════════════════════════════
-#  STEP 8 — Oldingi ish joyi
+#  STEP 7 — Oldingi ish joyi
 # ══════════════════════════════════════════
 @dp.message_handler(state=VacancyForm.prev_job)
 async def get_vacancy_prev_job(message: types.Message, state: FSMContext):
     await state.update_data(prev_job=message.text.strip())
+    if (await state.get_data()).get(EDIT_FLAG):
+        await show_preview(message, state); return
+    await VacancyForm.prev_experience.set()
+    await message.answer(
+        "💼 <b>8/24</b> — Oldingi ish tajribangiz qancha?",
+        parse_mode="HTML", reply_markup=_prev_exp_kb()
+    )
+
+
+# ══════════════════════════════════════════
+#  STEP 8 — Oldingi tajriba
+# ══════════════════════════════════════════
+@dp.message_handler(state=VacancyForm.prev_experience)
+async def get_prev_experience(message: types.Message, state: FSMContext):
+    if message.text not in PREV_EXP_OPTIONS:
+        await message.answer("❗ Iltimos, tugmalardan birini tanlang."); return
+    await state.update_data(prev_experience=message.text)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview(message, state); return
     await VacancyForm.married.set()
@@ -986,7 +986,7 @@ async def confirm_form(message: types.Message, state: FSMContext):
             "1 Lavozim",        "2 Ism-Familiya",
             "3 Telefon",        "4 Rasm",
             "5 Manzil",         "6 Tug'ilgan kun",
-            "7 Tajriba",        "8 Oldingi ish",
+            "7 Oldingi ish",    "8 Tajriba",
             "9 Oila",           "10 Ovozli xabar",
             "11 Rus tili",      "12 O'zbek tili",
             "13 Tojik tili",    "14 Rozilik",
@@ -1008,8 +1008,8 @@ async def confirm_form(message: types.Message, state: FSMContext):
         "4 Rasm":           (VacancyForm.photo,           lambda: types.ReplyKeyboardRemove(), "🤳 Yangi rasmingizni yuboring:"),
         "5 Manzil":         (VacancyForm.address,         lambda: types.ReplyKeyboardRemove(), "🏠 Yangi manzilingizni kiriting:"),
         "6 Tug'ilgan kun":  (VacancyForm.birth_date,      lambda: types.ReplyKeyboardRemove(), "🎂 Tug'ilgan kuningizni kiriting (01.01.2000):"),
-        "7 Tajriba":        (VacancyForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
-        "8 Oldingi ish":    (VacancyForm.prev_job,        lambda: types.ReplyKeyboardRemove(), "💼 Oldin qaysi lavozimda ishlagansiz?"),
+        "7 Oldingi ish":    (VacancyForm.prev_job,        lambda: types.ReplyKeyboardRemove(), "💼 Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n<i>Misol: Do'kon kassiri, ombor mudiri</i>"),
+        "8 Tajriba":        (VacancyForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
         "9 Oila":           (VacancyForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
         "10 Ovozli xabar":  (VacancyForm.voice_family,    lambda: types.ReplyKeyboardRemove(), "🎙 Oila haqida yangi ovozli xabar yuboring:"),
         "11 Rus tili":      (VacancyForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
@@ -1324,9 +1324,22 @@ async def sotuvchi_get_birth_date(message: types.Message, state: FSMContext):
     await state.update_data(birth_date=val)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview_sotuvchi(message, state); return
+    await SotuvchiForm.prev_job.set()
+    await message.answer(
+        "💼 <b>6/22</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
+        "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
+        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+    )
+
+
+@dp.message_handler(state=SotuvchiForm.prev_job)
+async def sotuvchi_get_prev_job(message: types.Message, state: FSMContext):
+    await state.update_data(prev_job=message.text.strip())
+    if (await state.get_data()).get(EDIT_FLAG):
+        await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.prev_experience.set()
     await message.answer(
-        "💼 <b>6/20</b> — Oldingi ish tajribangiz qancha?",
+        "💼 <b>7/22</b> — Oldingi ish tajribangiz qancha?",
         parse_mode="HTML", reply_markup=_prev_exp_kb()
     )
 
@@ -1336,19 +1349,6 @@ async def sotuvchi_get_prev_experience(message: types.Message, state: FSMContext
     if message.text not in PREV_EXP_OPTIONS:
         await message.answer("❗ Iltimos, tugmalardan birini tanlang."); return
     await state.update_data(prev_experience=message.text)
-    if (await state.get_data()).get(EDIT_FLAG):
-        await show_preview_sotuvchi(message, state); return
-    await SotuvchiForm.prev_job.set()
-    await message.answer(
-        "💼 <b>7/22</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
-        "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
-        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
-    )
-
-
-@dp.message_handler(state=SotuvchiForm.prev_job)
-async def sotuvchi_get_prev_job(message: types.Message, state: FSMContext):
-    await state.update_data(prev_job=message.text.strip())
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.married.set()
@@ -1633,7 +1633,7 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
             "S1 Lavozim",        "S2 Ism-Familiya",
             "S3 Telefon",        "S4 Rasm",
             "S5 Manzil",         "S6 Tug'ilgan kun",
-            "S7 Tajriba",        "S8 Oldingi ish",
+            "S7 Oldingi ish",    "S8 Tajriba",
             "S9 Oila",           "S10 Rus tili",
             "S11 O'zbek tili",   "S12 Tojik tili",
             "S13 Rozilik",       "S14 Tavsiya",
@@ -1654,8 +1654,8 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
         "S4 Rasm":           (SotuvchiForm.photo,           lambda: types.ReplyKeyboardRemove(), "🤳 Yangi rasmingizni yuboring:"),
         "S5 Manzil":         (SotuvchiForm.address,         lambda: types.ReplyKeyboardRemove(), "🏠 Yangi manzilingizni kiriting:"),
         "S6 Tug'ilgan kun":  (SotuvchiForm.birth_date,      lambda: types.ReplyKeyboardRemove(), "🎂 Tug'ilgan kuningizni kiriting (01.01.2000):"),
-        "S7 Tajriba":        (SotuvchiForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
-        "S8 Oldingi ish":   (SotuvchiForm.prev_job,        lambda: types.ReplyKeyboardRemove(), "💼 Oldin qaysi lavozimda ishlagansiz?"),
+        "S7 Oldingi ish":   (SotuvchiForm.prev_job,        lambda: types.ReplyKeyboardRemove(), "💼 Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n<i>Misol: Do'kon kassiri, ombor mudiri</i>"),
+        "S8 Tajriba":        (SotuvchiForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
         "S9 Oila":          (SotuvchiForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
         "S10 Rus tili":       (SotuvchiForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
         "S11 O'zbek tili":   (SotuvchiForm.english_level,   _lang_kb,                            "🇺🇿 O'zbek tili darajangizni tanlang:"),
