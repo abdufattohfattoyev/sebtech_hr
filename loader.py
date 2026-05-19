@@ -8,6 +8,7 @@ storage = RedisStorage2(
     host=config.REDIS_HOST,
     port=config.REDIS_PORT,
     db=config.REDIS_DB,
+    pool_size=100,
 )
 dp = Dispatcher(bot, storage=storage)
 ADMIN_ID = 973358587
