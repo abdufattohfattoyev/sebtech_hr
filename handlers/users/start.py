@@ -66,22 +66,23 @@ class VacancyForm(StatesGroup):
     address          = State()   # 5
     birth_date       = State()   # 6
     prev_experience  = State()   # 7
-    married          = State()   # 8
-    voice_family     = State()   # 9
-    russian_level    = State()   # 10
-    english_level    = State()   # 11
-    tajik_level      = State()   # 12
-    ref_consent      = State()   # 13
-    ref_person       = State()   # 14
-    work_duration    = State()   # 15
-    overtime         = State()   # 16
-    health_ok        = State()   # 17
-    late_reason      = State()   # 18
-    theft_reason     = State()   # 19
-    perf_reason      = State()   # 20
-    prev_salary      = State()   # 21
-    expected_salary  = State()   # 22
-    courses          = State()   # 23
+    prev_job         = State()   # 8
+    married          = State()   # 9
+    voice_family     = State()   # 10
+    russian_level    = State()   # 11
+    english_level    = State()   # 12
+    tajik_level      = State()   # 13
+    ref_consent      = State()   # 14
+    ref_person       = State()   # 15
+    work_duration    = State()   # 16
+    overtime         = State()   # 17
+    health_ok        = State()   # 18
+    late_reason      = State()   # 19
+    theft_reason     = State()   # 20
+    perf_reason      = State()   # 21
+    prev_salary      = State()   # 22
+    expected_salary  = State()   # 23
+    courses          = State()   # 24
     confirm          = State()
 
 
@@ -216,22 +217,23 @@ async def show_preview(message: types.Message, state: FSMContext):
         f"5.  <b>Manzil:</b> {data.get('address', '—')}\n"
         f"6.  <b>Tug'ilgan kun:</b> {data.get('birth_date', '—')}\n"
         f"7.  <b>Oldingi tajriba:</b> {data.get('prev_experience', '—')}\n"
-        f"8.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
-        f"9.  <b>Oila ovozi:</b> {'✅ Yuborildi' if data.get('voice_family') else '—'}\n"
-        f"10. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-        f"11. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
-        f"12. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
-        f"13. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
-        f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
-        f"15. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
-        f"16. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
-        f"17. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
-        f"18. <b>Kech kelish sababi:</b> {data.get('late_reason', '—')}\n"
-        f"19. <b>O'g'rilik sababi:</b> {data.get('theft_reason', '—')}\n"
-        f"20. <b>Ishlash sifati:</b> {data.get('perf_reason', '—')}\n"
-        f"21. <b>Oldingi maosh:</b> {data.get('prev_salary', '—')}\n"
-        f"22. <b>Kutilayotgan maosh:</b> {data.get('expected_salary', '—')}\n"
-        f"23. <b>Kurslar:</b> {data.get('courses', '—')}\n"
+        f"8.  <b>Oldingi ish:</b> {data.get('prev_job', '—')}\n"
+        f"9.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
+        f"10. <b>Oila ovozi:</b> {'✅ Yuborildi' if data.get('voice_family') else '—'}\n"
+        f"11. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
+        f"12. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
+        f"13. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
+        f"14. <b>Surishtirishga rozilik:</b> {data.get('ref_consent', '—')}\n"
+        + (f"15. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n" if data.get('ref_consent') == '✅ Ha' else "")
+        + f"16. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
+        f"17. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
+        f"18. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
+        f"19. <b>Kech kelish sababi:</b> {data.get('late_reason', '—')}\n"
+        f"20. <b>O'g'rilik sababi:</b> {data.get('theft_reason', '—')}\n"
+        f"21. <b>Ishlash sifati:</b> {data.get('perf_reason', '—')}\n"
+        f"22. <b>Oldingi maosh:</b> {data.get('prev_salary', '—')}\n"
+        f"23. <b>Kutilayotgan maosh:</b> {data.get('expected_salary', '—')}\n"
+        f"24. <b>Kurslar:</b> {data.get('courses', '—')}\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
         "Ma'lumotlar to'g'rimi?"
     )
@@ -475,7 +477,7 @@ async def get_vacancy(message: types.Message, state: FSMContext):
     else:
         await VacancyForm.full_name.set()
         await message.answer(
-            "✍️ <b>2/23</b> — Ism va familiyangizni kiriting:\n<i>Misol: Aliyev Jasur</i>",
+            "✍️ <b>2/24</b> — Ism va familiyangizni kiriting:\n<i>Misol: Aliyev Jasur</i>",
             parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
         )
 
@@ -493,7 +495,7 @@ async def get_full_name(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.phone.set()
     await message.answer(
-        "📱 <b>3/22</b> — Telefon raqamingizni yuboring:",
+        "📱 <b>3/24</b> — Telefon raqamingizni yuboring:",
         parse_mode="HTML", reply_markup=_phone_kb()
     )
 
@@ -515,7 +517,7 @@ async def get_phone(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.photo.set()
     await message.answer(
-        "🤳 <b>4/22</b> — Rasmingizni yuboring (selfie yoki profil rasm):",
+        "🤳 <b>4/24</b> — Rasmingizni yuboring (selfie yoki profil rasm):",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
 
@@ -530,7 +532,7 @@ async def get_photo_cc(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.address.set()
     await message.answer(
-        "🏠 <b>5/22</b> — Doimiy yashash manzilingizni yozing (propiska):\n"
+        "🏠 <b>5/24</b> — Doimiy yashash manzilingizni yozing (propiska):\n"
         "<i>Misol: Samarqand shahar</i>",
         parse_mode="HTML"
     )
@@ -556,7 +558,7 @@ async def get_address(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.birth_date.set()
     await message.answer(
-        "🎂 <b>6/22</b> — O'z tug'ilgan kuningizni yozing:\n<i>Format: 01.01.2000</i>",
+        "🎂 <b>6/24</b> — O'z tug'ilgan kuningizni yozing:\n<i>Format: 01.01.2000</i>",
         parse_mode="HTML"
     )
 
@@ -575,7 +577,7 @@ async def get_birth_date(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.prev_experience.set()
     await message.answer(
-        "💼 <b>7/22</b> — Oldingi ish tajribangiz qancha?",
+        "💼 <b>7/24</b> — Oldingi ish tajribangiz qancha?",
         parse_mode="HTML", reply_markup=_prev_exp_kb()
     )
 
@@ -590,15 +592,31 @@ async def get_prev_experience(message: types.Message, state: FSMContext):
     await state.update_data(prev_experience=message.text)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview(message, state); return
+    await VacancyForm.prev_job.set()
+    await message.answer(
+        "💼 <b>8/24</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
+        "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
+        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+    )
+
+
+# ══════════════════════════════════════════
+#  STEP 8 — Oldingi ish joyi
+# ══════════════════════════════════════════
+@dp.message_handler(state=VacancyForm.prev_job)
+async def get_vacancy_prev_job(message: types.Message, state: FSMContext):
+    await state.update_data(prev_job=message.text.strip())
+    if (await state.get_data()).get(EDIT_FLAG):
+        await show_preview(message, state); return
     await VacancyForm.married.set()
     await message.answer(
-        "👨‍👩‍👧 <b>8/22</b> — Oila qurganmisiz?",
+        "👨‍👩‍👧 <b>9/24</b> — Oila qurganmisiz?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
 
 # ══════════════════════════════════════════
-#  STEP 7 — Oila qurganmisiz
+#  STEP 9 — Oila qurganmisiz
 # ══════════════════════════════════════════
 @dp.message_handler(state=VacancyForm.married)
 async def get_married(message: types.Message, state: FSMContext):
@@ -613,13 +631,13 @@ async def get_married(message: types.Message, state: FSMContext):
         await bot.send_voice(
             chat_id=message.chat.id,
             voice=q8_voice_id,
-            caption="🎙 <b>9/22</b> — Oilangiz haqida <b>1 daqiqa ichida</b> ovozli xabar yuboring:",
+            caption="🎙 <b>10/24</b> — Oilangiz haqida <b>1 daqiqa ichida</b> ovozli xabar yuboring:",
             parse_mode="HTML",
             reply_markup=types.ReplyKeyboardRemove()
         )
     else:
         await message.answer(
-            "🎙 <b>9/22</b> — Oilangiz haqida <b>1 daqiqa ichida</b> ovozli xabar yuboring:",
+            "🎙 <b>10/24</b> — Oilangiz haqida <b>1 daqiqa ichida</b> ovozli xabar yuboring:",
             parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
         )
 
@@ -634,7 +652,7 @@ async def get_voice_family(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.russian_level.set()
     await message.answer(
-        "🇷🇺 <b>10/22</b> — Rus tilini qay darajada bilasiz?",
+        "🇷🇺 <b>11/24</b> — Rus tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -658,7 +676,7 @@ async def get_russian_level(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.english_level.set()
     await message.answer(
-        "🇺🇿 <b>11/23</b> — O'zbek tilini qay darajada bilasiz?",
+        "🇺🇿 <b>12/24</b> — O'zbek tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -675,7 +693,7 @@ async def get_english_level(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.tajik_level.set()
     await message.answer(
-        "🇹🇯 <b>12/23</b> — Tojik tilini qay darajada bilasiz?",
+        "🇹🇯 <b>13/24</b> — Tojik tilini qay darajada bilasiz?",
         parse_mode="HTML", reply_markup=_lang_kb()
     )
 
@@ -692,7 +710,7 @@ async def get_tajik_level(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.ref_consent.set()
     await message.answer(
-        "🔍 <b>13/23</b> — Oxirgi ish joyingizdan siz haqingizda surishtirishimizga rozimisiz?",
+        "🔍 <b>14/24</b> — Oxirgi ish joyingizdan siz haqingizda surishtirishimizga rozimisiz?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -707,12 +725,20 @@ async def get_ref_consent(message: types.Message, state: FSMContext):
     await state.update_data(ref_consent=message.text)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview(message, state); return
-    await VacancyForm.ref_person.set()
-    await message.answer(
-        "📝 <b>14/23</b> — Oxirgi ish joyingizdan kim sizga tavsiya xati bera oladi?\n"
-        "<i>Nomi, ishlash joyi, lavozimi, telefon raqami:</i>",
-        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
-    )
+    if message.text == "✅ Ha":
+        await VacancyForm.ref_person.set()
+        await message.answer(
+            "📝 <b>15/24</b> — Siz haqingizda ma'lumot bera oladigan kishi bormi?\n"
+            "<i>Ismi, aloqasi va siz uni qayerdan tanishingizni yozing</i>",
+            parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+        )
+    else:
+        await state.update_data(ref_person="—")
+        await VacancyForm.work_duration.set()
+        await message.answer(
+            "⏳ <b>16/24</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
+            parse_mode="HTML", reply_markup=_work_dur_kb()
+        )
 
 
 # ══════════════════════════════════════════
@@ -725,7 +751,7 @@ async def get_ref_person(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.work_duration.set()
     await message.answer(
-        "⏳ <b>15/23</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
+        "⏳ <b>16/24</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
         parse_mode="HTML", reply_markup=_work_dur_kb()
     )
 
@@ -742,7 +768,7 @@ async def get_work_duration(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.overtime.set()
     await message.answer(
-        "🕐 <b>16/23</b> — Korxonada ishdan keyin ham qolib ishlash kerak bo'lib qolsa ishlaysizmi?",
+        "🕐 <b>17/24</b> — Korxonada ishdan keyin ham qolib ishlash kerak bo'lib qolsa ishlaysizmi?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -759,7 +785,7 @@ async def get_overtime(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.health_ok.set()
     await message.answer(
-        "🏥 <b>17/23</b> — Sog'ligingizda muammo yo'qmi?",
+        "🏥 <b>18/24</b> — Sog'ligingizda muammo yo'qmi?",
         parse_mode="HTML", reply_markup=_yes_no_kb()
     )
 
@@ -776,7 +802,7 @@ async def get_health_ok(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.late_reason.set()
     await message.answer(
-        "<b>18/23</b> — Nima uchun ayrim odamlar ishga kech kelishadi?",
+        "<b>19/24</b> — Nima uchun ayrim odamlar ishga kech kelishadi?",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
 
@@ -791,7 +817,7 @@ async def get_late_reason(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.theft_reason.set()
     await message.answer(
-        "<b>19/23</b> — Nima uchun ayrim insonlar o'g'rilik qilishadi?",
+        "<b>20/24</b> — Nima uchun ayrim insonlar o'g'rilik qilishadi?",
         parse_mode="HTML"
     )
 
@@ -806,7 +832,7 @@ async def get_theft_reason(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.perf_reason.set()
     await message.answer(
-        "🤔 <b>20/23</b> — Nima uchun ayrim ishchilar yaxshi ishlashadi, ayrimlari yomon?\n"
+        "🤔 <b>21/24</b> — Nima uchun ayrim ishchilar yaxshi ishlashadi, ayrimlari yomon?\n"
         "Bunga sabab nima?",
         parse_mode="HTML"
     )
@@ -822,7 +848,7 @@ async def get_perf_reason(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.prev_salary.set()
     await message.answer(
-        "💰 <b>21/23</b> — Oldingi ishxonangizda qancha maoshga ishlagansiz?\n"
+        "💰 <b>22/24</b> — Oldingi ishxonangizda qancha maoshga ishlagansiz?\n"
         "<i>Misol: 3 000 000 so'm</i>",
         parse_mode="HTML"
     )
@@ -841,7 +867,7 @@ async def get_prev_salary(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.expected_salary.set()
     await message.answer(
-        "💵 <b>22/23</b> — Bizning ishxonamizda qancha maoshga ishlamoqchisiz?\n"
+        "💵 <b>23/24</b> — Bizning ishxonamizda qancha maoshga ishlamoqchisiz?\n"
         "<i>Misol: 5000000</i>",
         parse_mode="HTML"
     )
@@ -860,7 +886,7 @@ async def get_expected_salary(message: types.Message, state: FSMContext):
         await show_preview(message, state); return
     await VacancyForm.courses.set()
     await message.answer(
-        "📚 <b>23/23</b> — Qanday kurslarda o'qigansiz?\n"
+        "📚 <b>24/24</b> — Qanday kurslarda o'qigansiz?\n"
         "<i>Misol: Moliya asoslari, Call-center asoslari</i>",
         parse_mode="HTML"
     )
@@ -895,21 +921,22 @@ async def confirm_form(message: types.Message, state: FSMContext):
             f"5.  <b>Manzil:</b> {data.get('address', '—')}\n"
             f"6.  <b>Tug'ilgan kun:</b> {data.get('birth_date', '—')}\n"
             f"7.  <b>Oldingi tajriba:</b> {data.get('prev_experience', '—')}\n"
-            f"8.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
-            f"10. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
-            f"11. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
-            f"12. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
-            f"13. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
-            f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
-            f"15. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
-            f"16. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
-            f"17. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
-            f"18. <b>Kech kelish:</b> {data.get('late_reason', '—')}\n"
-            f"19. <b>O'g'rilik:</b> {data.get('theft_reason', '—')}\n"
-            f"20. <b>Ishlash sifati:</b> {data.get('perf_reason', '—')}\n"
-            f"21. <b>Oldingi maosh:</b> {data.get('prev_salary', '—')}\n"
-            f"22. <b>Kutilayotgan maosh:</b> {data.get('expected_salary', '—')}\n"
-            f"23. <b>Kurslar:</b> {data.get('courses', '—')}\n"
+            f"8.  <b>Oldingi ish:</b> {data.get('prev_job', '—')}\n"
+            f"9.  <b>Oila qurganmi:</b> {data.get('married', '—')}\n"
+            f"11. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
+            f"12. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
+            f"13. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
+            f"14. <b>Surishtirishga rozilik:</b> {data.get('ref_consent', '—')}\n"
+            + (f"15. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n" if data.get('ref_consent') == '✅ Ha' else "")
+            + f"16. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
+            f"17. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
+            f"18. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
+            f"19. <b>Kech kelish:</b> {data.get('late_reason', '—')}\n"
+            f"20. <b>O'g'rilik:</b> {data.get('theft_reason', '—')}\n"
+            f"21. <b>Ishlash sifati:</b> {data.get('perf_reason', '—')}\n"
+            f"22. <b>Oldingi maosh:</b> {data.get('prev_salary', '—')}\n"
+            f"23. <b>Kutilayotgan maosh:</b> {data.get('expected_salary', '—')}\n"
+            f"24. <b>Kurslar:</b> {data.get('courses', '—')}\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
             f"🔗 Username: @{user.username if user.username else 'yoq'}\n"
             f"📛 To'liq ism: {user.full_name}"
@@ -934,7 +961,7 @@ async def confirm_form(message: types.Message, state: FSMContext):
                     await bot.send_voice(
                         chat_id=admin_id,
                         voice=voice_id,
-                        caption="🎙 9-savol: Oila haqida ovozli xabar"
+                        caption="🎙 10-savol: Oila haqida ovozli xabar"
                     )
                 except Exception:
                     pass
@@ -959,15 +986,15 @@ async def confirm_form(message: types.Message, state: FSMContext):
             "1 Lavozim",        "2 Ism-Familiya",
             "3 Telefon",        "4 Rasm",
             "5 Manzil",         "6 Tug'ilgan kun",
-            "7 Tajriba",        "8 Oila",
-            "9 Ovozli xabar",   "10 Rus tili",
-            "11 O'zbek tili",   "12 Tojik tili",
-            "13 Rozilik",       "14 Tavsiya",
-            "15 Muddat",        "16 Ortiqcha ish",
-            "17 Sog'liq",       "18 Kech kelish",
-            "19 O'g'rilik",     "20 Ishlash sifati",
-            "21 Oldingi maosh", "22 Kutilayotgan",
-            "23 Kurslar",
+            "7 Tajriba",        "8 Oldingi ish",
+            "9 Oila",           "10 Ovozli xabar",
+            "11 Rus tili",      "12 O'zbek tili",
+            "13 Tojik tili",    "14 Rozilik",
+            "15 Tavsiya",       "16 Muddat",
+            "17 Ortiqcha ish",  "18 Sog'liq",
+            "19 Kech kelish",   "20 O'g'rilik",
+            "21 Ishlash sifati","22 Oldingi maosh",
+            "23 Kutilayotgan",  "24 Kurslar",
         )
         kb.add("🔙 Orqaga")
         await message.answer("✏️ Qaysi ma'lumotni o'zgartirmoqchisiz?", reply_markup=kb)
@@ -982,22 +1009,23 @@ async def confirm_form(message: types.Message, state: FSMContext):
         "5 Manzil":         (VacancyForm.address,         lambda: types.ReplyKeyboardRemove(), "🏠 Yangi manzilingizni kiriting:"),
         "6 Tug'ilgan kun":  (VacancyForm.birth_date,      lambda: types.ReplyKeyboardRemove(), "🎂 Tug'ilgan kuningizni kiriting (01.01.2000):"),
         "7 Tajriba":        (VacancyForm.prev_experience, _prev_exp_kb,                        "💼 Oldingi ish tajribangiz qancha?"),
-        "8 Oila":           (VacancyForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
-        "9 Ovozli xabar":   (VacancyForm.voice_family,    lambda: types.ReplyKeyboardRemove(), "🎙 <b>9/23</b> — Oila haqida yangi ovozli xabar yuboring:"),
-        "10 Rus tili":      (VacancyForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
-        "11 O'zbek tili":   (VacancyForm.english_level,   _lang_kb,                            "🇺🇿 O'zbek tili darajangizni tanlang:"),
-        "12 Tojik tili":    (VacancyForm.tajik_level,     _lang_kb,                            "🇹🇯 Tojik tili darajangizni tanlang:"),
-        "13 Rozilik":       (VacancyForm.ref_consent,     _yes_no_kb,                          "🔍 Surishtirishga rozimisiz?"),
-        "14 Tavsiya":       (VacancyForm.ref_person,      lambda: types.ReplyKeyboardRemove(), "📝 Tavsiya xati bera oladigan kishini yozing:"),
-        "15 Muddat":        (VacancyForm.work_duration,   _work_dur_kb,                        "⏳ Qancha muddat ishlamoqchisiz?"),
-        "16 Ortiqcha ish":  (VacancyForm.overtime,        _yes_no_kb,                          "🕐 Ortiqcha ish vaqtida ishlaysizmi?"),
-        "17 Sog'liq":       (VacancyForm.health_ok,       _yes_no_kb,                          "🏥 Sog'ligingizda muammo yo'qmi?"),
-        "18 Kech kelish":   (VacancyForm.late_reason,     lambda: types.ReplyKeyboardRemove(), "🤔 Nima uchun kech kelishadi?"),
-        "19 O'g'rilik":     (VacancyForm.theft_reason,    lambda: types.ReplyKeyboardRemove(), "🤔 Nima uchun o'g'rilik qilishadi?"),
-        "20 Ishlash sifati":(VacancyForm.perf_reason,     lambda: types.ReplyKeyboardRemove(), "🤔 Yaxshi/yomon ishlash sababi:"),
-        "21 Oldingi maosh": (VacancyForm.prev_salary,     lambda: types.ReplyKeyboardRemove(), "💰 Oldingi maoshingizni kiriting:"),
-        "22 Kutilayotgan":  (VacancyForm.expected_salary, lambda: types.ReplyKeyboardRemove(), "💵 Kutilayotgan maoshingizni kiriting:"),
-        "23 Kurslar":       (VacancyForm.courses,         lambda: types.ReplyKeyboardRemove(), "📚 Qanday kurslarda o'qigansiz?"),
+        "8 Oldingi ish":    (VacancyForm.prev_job,        lambda: types.ReplyKeyboardRemove(), "💼 Oldin qaysi lavozimda ishlagansiz?"),
+        "9 Oila":           (VacancyForm.married,         _yes_no_kb,                          "👨‍👩‍👧 Oila qurganmisiz?"),
+        "10 Ovozli xabar":  (VacancyForm.voice_family,    lambda: types.ReplyKeyboardRemove(), "🎙 Oila haqida yangi ovozli xabar yuboring:"),
+        "11 Rus tili":      (VacancyForm.russian_level,   _lang_kb,                            "🇷🇺 Rus tili darajangizni tanlang:"),
+        "12 O'zbek tili":   (VacancyForm.english_level,   _lang_kb,                            "🇺🇿 O'zbek tili darajangizni tanlang:"),
+        "13 Tojik tili":    (VacancyForm.tajik_level,     _lang_kb,                            "🇹🇯 Tojik tili darajangizni tanlang:"),
+        "14 Rozilik":       (VacancyForm.ref_consent,     _yes_no_kb,                          "🔍 Surishtirishga rozimisiz?"),
+        "15 Tavsiya":       (VacancyForm.ref_person,      lambda: types.ReplyKeyboardRemove(), "📝 Tavsiya xati bera oladigan kishini yozing:"),
+        "16 Muddat":        (VacancyForm.work_duration,   _work_dur_kb,                        "⏳ Qancha muddat ishlamoqchisiz?"),
+        "17 Ortiqcha ish":  (VacancyForm.overtime,        _yes_no_kb,                          "🕐 Ortiqcha ish vaqtida ishlaysizmi?"),
+        "18 Sog'liq":       (VacancyForm.health_ok,       _yes_no_kb,                          "🏥 Sog'ligingizda muammo yo'qmi?"),
+        "19 Kech kelish":   (VacancyForm.late_reason,     lambda: types.ReplyKeyboardRemove(), "🤔 Nima uchun kech kelishadi?"),
+        "20 O'g'rilik":     (VacancyForm.theft_reason,    lambda: types.ReplyKeyboardRemove(), "🤔 Nima uchun o'g'rilik qilishadi?"),
+        "21 Ishlash sifati":(VacancyForm.perf_reason,     lambda: types.ReplyKeyboardRemove(), "🤔 Yaxshi/yomon ishlash sababi:"),
+        "22 Oldingi maosh": (VacancyForm.prev_salary,     lambda: types.ReplyKeyboardRemove(), "💰 Oldingi maoshingizni kiriting:"),
+        "23 Kutilayotgan":  (VacancyForm.expected_salary, lambda: types.ReplyKeyboardRemove(), "💵 Kutilayotgan maoshingizni kiriting:"),
+        "24 Kurslar":       (VacancyForm.courses,         lambda: types.ReplyKeyboardRemove(), "📚 Qanday kurslarda o'qigansiz?"),
     }
 
     if message.text in edit_map:
@@ -1190,9 +1218,9 @@ async def show_preview_sotuvchi(message: types.Message, state: FSMContext):
         f"10. <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
         f"11. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
         f"12. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
-        f"13. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
-        f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
-        f"15. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
+        f"13. <b>Surishtirishga rozilik:</b> {data.get('ref_consent', '—')}\n"
+        + (f"14. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n" if data.get('ref_consent') == '✅ Ha' else "")
+        + f"15. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
         f"16. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
         f"17. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
         f"18. <b>Kech kelish sababi:</b> {data.get('late_reason', '—')}\n"
@@ -1312,7 +1340,7 @@ async def sotuvchi_get_prev_experience(message: types.Message, state: FSMContext
         await show_preview_sotuvchi(message, state); return
     await SotuvchiForm.prev_job.set()
     await message.answer(
-        "💼 <b>7/23</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
+        "💼 <b>7/22</b> — Oldin qaysi sohada / qanday lavozimda ishlagansiz?\n"
         "<i>Misol: Do'kon kassiri, ombor mudiri</i>",
         parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
     )
@@ -1393,12 +1421,20 @@ async def sotuvchi_get_ref_consent(message: types.Message, state: FSMContext):
     await state.update_data(ref_consent=message.text)
     if (await state.get_data()).get(EDIT_FLAG):
         await show_preview_sotuvchi(message, state); return
-    await SotuvchiForm.ref_person.set()
-    await message.answer(
-        "📝 <b>13/22</b> — Oxirgi ish joyingizdan kim sizga tavsiya xati bera oladi?\n"
-        "<i>Nomi, ishlash joyi, lavozimi, telefon raqami:</i>",
-        parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
-    )
+    if message.text == "✅ Ha":
+        await SotuvchiForm.ref_person.set()
+        await message.answer(
+            "📝 <b>13/22</b> — Siz haqingizda ma'lumot bera oladigan kishi bormi?\n"
+            "<i>Ismi, aloqasi va siz uni qayerdan tanishingizni yozing</i>",
+            parse_mode="HTML", reply_markup=types.ReplyKeyboardRemove()
+        )
+    else:
+        await state.update_data(ref_person="—")
+        await SotuvchiForm.work_duration.set()
+        await message.answer(
+            "⏳ <b>14/22</b> — Bizning korxonada qancha muddat ishlamoqchisiz?",
+            parse_mode="HTML", reply_markup=_work_dur_kb()
+        )
 
 
 @dp.message_handler(state=SotuvchiForm.ref_person)
@@ -1554,9 +1590,9 @@ async def sotuvchi_confirm_form(message: types.Message, state: FSMContext):
             f"9.  <b>Rus tili:</b> {data.get('russian_level', '—')}\n"
             f"10. <b>O'zbek tili:</b> {data.get('english_level', '—')}\n"
             f"11. <b>Tojik tili:</b> {data.get('tajik_level', '—')}\n"
-            f"12. <b>Surish. rozilik:</b> {data.get('ref_consent', '—')}\n"
-            f"13. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n"
-            f"14. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
+            f"12. <b>Surishtirishga rozilik:</b> {data.get('ref_consent', '—')}\n"
+            + (f"13. <b>Tavsiya kishi:</b> {data.get('ref_person', '—')}\n" if data.get('ref_consent') == '✅ Ha' else "")
+            + f"14. <b>Ishlash muddati:</b> {data.get('work_duration', '—')}\n"
             f"15. <b>Ortiqcha ish:</b> {data.get('overtime', '—')}\n"
             f"16. <b>Sog'liq:</b> {data.get('health_ok', '—')}\n"
             f"17. <b>Kech kelish:</b> {data.get('late_reason', '—')}\n"

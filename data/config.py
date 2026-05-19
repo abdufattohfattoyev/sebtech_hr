@@ -1,9 +1,12 @@
 from environs import Env
 
-# environs kutubxonasidan foydalanish
 env = Env()
 env.read_env()
-# .env fayl ichidan quyidagilarni o'qiymiz
-BOT_TOKEN = env.str("BOT_TOKEN")  # Bot toekn
-ADMINS = env.list("ADMINS")  # adminlar ro'yxati
-IP = env.str("ip")  # Xosting ip manzili
+
+BOT_TOKEN = env.str("BOT_TOKEN")
+ADMINS = env.list("ADMINS")
+IP = env.str("ip")
+
+REDIS_HOST = env.str("REDIS_HOST", "localhost")
+REDIS_PORT = env.int("REDIS_PORT", 6379)
+REDIS_DB   = env.int("REDIS_DB", 0)

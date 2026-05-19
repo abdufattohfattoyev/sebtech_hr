@@ -6,11 +6,13 @@ services:
     container_name: sebtech_hr_bot
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - ADMINS=${ADMINS}
+      - ip=${ip}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
     volumes:
-      - ./data:/app/data
+      - ./handlers/users:/app/handlers/users
     depends_on:
       redis:
         condition: service_healthy
@@ -21,10 +23,9 @@ services:
   redis:
     image: redis:7.0-alpine
     container_name: redis
+    command: redis-server --save 60 1 --loglevel warning
     volumes:
       - redis-data:/data
-    ports:
-      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -35,7 +36,6 @@ services:
       - bot-network
 
 volumes:
-  data:
   redis-data:
 
 networks:
